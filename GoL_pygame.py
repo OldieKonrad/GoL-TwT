@@ -1,6 +1,4 @@
 import pygame
-import random
-from collections import deque
 from GoL_class import GoL
 
 pygame.init()
@@ -9,7 +7,7 @@ BLACK = (0, 0, 0)
 GREY = (128, 128, 128)
 YELLOW = (255, 255, 0)
 
-WIDTH, HEIGHT = 1024, 1024
+WIDTH, HEIGHT = 512, 512
 TILE_SIZE = 8
 GRID_WIDTH = WIDTH // TILE_SIZE
 GRID_HEIGHT = HEIGHT // TILE_SIZE
@@ -35,7 +33,8 @@ def draw_grid(positions):
 
 def main():
     gol = GoL(GRID_WIDTH, GRID_HEIGHT, MAXGENERATIONS)
-    gol.randomPopulate()
+    #gol.randomPopulate()
+    gol.populateSpiral(4084)
     
     running = True
     playing = False
