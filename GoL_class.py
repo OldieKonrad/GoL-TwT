@@ -159,7 +159,7 @@ if __name__ == "__main__":
     gol = GoL(64, 64)
     maxgens = 0
     
-    for someint in range(2**16):
+    for someint in range(2**4):
         #gol.randomPopulate()
         gol.populateSpiral(someint)
     
