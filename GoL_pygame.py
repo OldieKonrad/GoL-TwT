@@ -32,9 +32,9 @@ def draw_grid(positions):
 
 
 def main():
-    gol = GoL(GRID_WIDTH, GRID_HEIGHT, MAXGENERATIONS)
+    gol = GoL(GRID_WIDTH, GRID_HEIGHT, bounded=False, maxgenerations=MAXGENERATIONS, maxhistory=10)
     #gol.randomPopulate()
-    gol.populateSpiral(4084)
+    gol.populateSpiral(4084)        # 4084
     
     running = True
     playing = False

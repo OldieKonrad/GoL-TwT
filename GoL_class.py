@@ -36,10 +36,12 @@ def getSpiralCoords(start: tuple):
 
 
 class GoL:
-    def __init__(self, width=20, height=20, maxgenerations=9_999, maxhistory=10):
+    def __init__(self, width=20, height=20, bounded=True, maxgenerations=9_999, maxhistory=10):
         self.width = width
         self.height = height
+        self.bounded = bounded
         self.maxhistory = maxhistory
+        self.history = deque(set(),self.maxhistory)
         self.maxgenerations = maxgenerations
         self.neighborsDict = dict()
         
@@ -49,7 +51,7 @@ class GoL:
         self.curLivings = set()
         self.generation = 0
         self.startset = set()
-        self.history = deque() #deque([set() for _ in range(self.maxhistory)], self.maxhistory)
+        self.history = deque(set(), self.maxhistory) #deque([set() for _ in range(self.maxhistory)], self.maxhistory)
         self.finished = False
         self.cycletime = 0
 
@@ -123,9 +125,12 @@ class GoL:
 
         for no in NEIGHBORS_OFFSET:
             x, y = pos[0] + no[0], pos[1] + no[1]
-            if x >= 0 and x < self.width and y >= 0 and y < self.height:
-                neighbors.append((x, y))
-        
+            if self.bounded:
+                if x >= 0 and x < self.width and y >= 0 and y < self.height:
+                    neighbors.append((x, y))
+            else:
+                neighbors.append(((x+self.width)%self.width,(y+self.height)%self.height))
+
         neighbors = set(neighbors)
         self.neighborsDict[pos] = neighbors
         
