@@ -1,5 +1,6 @@
 import random
 from collections import deque
+from functools import cache
 import time
 import math
 
@@ -43,7 +44,6 @@ class GoL:
         self.maxhistory = maxhistory
         self.history = deque(set(),self.maxhistory)
         self.maxgenerations = maxgenerations
-        self.neighborsDict = dict()
         
         self.reset()
         
@@ -80,22 +80,29 @@ class GoL:
             return
         if self.generation >= self.maxgenerations:
             self.finished = True
+            return
             
         allNeighbors = set()
         newLivings = set()
 
         for cell in self.curLivings:
             cellneighbors = self.getNeighbors(cell)
-
-            liveneighbors = set(filter(lambda x: x in self.curLivings, cellneighbors))
+            
+            liveneighbors = set()
+            for c in cellneighbors:                     # split neighbors in living and not living neighbors
+                if (c in self.curLivings):  liveneighbors.add(c)
+                else:                       allNeighbors.add(c)
 
             if len(liveneighbors) in [2, 3]:
                 newLivings.add(cell)
-            allNeighbors.update(cellneighbors.difference(liveneighbors))
+            
         
         for cell in allNeighbors:
             cellneighbors = self.getNeighbors(cell)
-            liveneighbors = set(filter(lambda x: x in self.curLivings, cellneighbors))
+
+            liveneighbors = set()
+            for c in cellneighbors:                     # split neighbors in living and not living neighbors
+                if (c in self.curLivings):  liveneighbors.add(c)
 
             if len(liveneighbors) == 3:
                 newLivings.add(cell)
@@ -115,11 +122,8 @@ class GoL:
         if len(newLivings)==0:
             self.finished = True
 
+    @cache
     def getNeighbors(self, pos):
-        neighbors = self.neighborsDict.get(pos)
-        if neighbors:
-            return neighbors
-        
         neighbors = []
         
 
@@ -132,7 +136,6 @@ class GoL:
                 neighbors.append(((x+self.width)%self.width,(y+self.height)%self.height))
 
         neighbors = set(neighbors)
-        self.neighborsDict[pos] = neighbors
         
         return neighbors
     
@@ -159,29 +162,17 @@ class GoL:
 ##########################
 if __name__ == "__main__":
     
-    start = time.perf_counter()     # vvvvvvvvvvvvvvvvvvvvvvvvv
+    start = time.perf_counter()###################################################################
 
-    gol = GoL(64, 64)
-    maxgens = 0
+    spiralint = 4084
+    gol = GoL(100, 100, bounded=False, maxgenerations=9999, maxhistory=10)
+    gol.populateSpiral(spiralint)        # 4084
     
-    for someint in range(2**4):
-        #gol.randomPopulate()
-        gol.populateSpiral(someint)
+    while not gol.finished: gol.nextGeneration()
     
-        while not gol.finished:
-            # gol.printGoL()
-            # print()
-            gol.nextGeneration()
-            
-        if gol.generation > maxgens:
-            maxgens = gol.generation
-
-        if gol.generation > 999:
-            print(f'Spiralint: {someint} Generations: {gol.generation} Cycletime: {gol.cycletime}')
-            
-    #print(f'maximum generations: {maxgens}')
+    print(f'Spiralint: {spiralint} Generations: {gol.generation} Cycletime: {gol.cycletime}')
     
-    end = time.perf_counter()       # ^^^^^^^^^^^^^^^^^^^^^^^
+    end = time.perf_counter()####################################################################
     print(f"Total Runtimme: {end - start:0.4f} seconds")
             
         
